@@ -7,8 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/19NXCqllHnNvGY6w1CSGep5Q37BP1NsNZ
 """
 
-
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -164,173 +162,151 @@ else:
 print("\n" + "="*50 + "\n")
 
 # =============================================================================
-# VISUALISATION 1 : NOMBRE D'EMPLOYÉS PAR DÉPARTEMENT
+# VISUALISATION UNIQUE : TOUS LES GRAPHIQUES ENSEMBLE (CORRIGÉE)
 # =============================================================================
 
-plt.figure(figsize=(12, 8))
-sns.countplot(data=df, x='Department', order=df['Department'].value_counts().index)
-plt.title("Nombre d'employés par département", fontsize=16, fontweight='bold')
-plt.xlabel("Département", fontsize=12)
-plt.ylabel("Nombre d'employés", fontsize=12)
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.show()
+print("=== VISUALISATION COMPLÈTE ===")
 
-print("\n" + "="*50 + "\n")
+# Créer une figure avec plusieurs sous-graphiques
+fig = plt.figure(figsize=(25, 30))
 
-# =============================================================================
-# VISUALISATION 2 : RÉPARTITION DES TYPES DE CONTRAT
-# =============================================================================
+# Configuration du style
+sns.set_style("whitegrid")
+plt.rcParams['font.size'] = 10
 
-plt.figure(figsize=(10, 6))
-sns.countplot(data=df, x='Job Type', order=df['Job Type'].value_counts().index)
-plt.title("Répartition des types de contrat", fontsize=16, fontweight='bold')
-plt.xlabel("Type de contrat", fontsize=12)
-plt.ylabel("Nombre d'employés", fontsize=12)
-plt.tight_layout()
-plt.show()
+# 1. Nombre d'employés par département
+ax1 = plt.subplot(3, 3, 1)
+sns.countplot(data=df, x='Department', order=df['Department'].value_counts().index, ax=ax1, palette='viridis')
+ax1.set_title("1. Nombre d'employés par département", fontsize=12, fontweight='bold')
+ax1.set_xlabel("Département")
+ax1.set_ylabel("Nombre d'employés")
+ax1.tick_params(axis='x', rotation=45)
 
-print("\n" + "="*50 + "\n")
+# 2. Répartition des types de contrat
+ax2 = plt.subplot(3, 3, 2)
+sns.countplot(data=df, x='Job Type', order=df['Job Type'].value_counts().index, ax=ax2, palette='viridis')
+ax2.set_title("2. Répartition des types de contrat", fontsize=12, fontweight='bold')
+ax2.set_xlabel("Type de contrat")
+ax2.set_ylabel("Nombre d'employés")
 
-# =============================================================================
-# VISUALISATION 3 : RÉPARTITION DE LA SATISFACTION PAR DÉPARTEMENT
-# =============================================================================
-
-plt.figure(figsize=(10, 10))
-plt.pie(avg_satisfaction.values,
-        labels=avg_satisfaction.index,
-        autopct='%1.1f%%',
-        startangle=140,
-        colors=sns.color_palette('pastel'),
-        textprops={'fontsize': 12})
-
-plt.title("Répartition de la satisfaction moyenne par département",
-          fontsize=16, fontweight='bold')
-plt.tight_layout()
-plt.show()
-
-print("\n" + "="*50 + "\n")
-
-# =============================================================================
-# VISUALISATION 4 : SALAIRES MOYENS PAR DÉPARTEMENT
-# =============================================================================
-
-plt.figure(figsize=(12, 8))
-sns.barplot(x=avg_salaire.index, y=avg_salaire.values, palette='viridis')
-plt.title("Salaire mensuel moyen par département", fontsize=16, fontweight='bold')
-plt.xlabel("Département", fontsize=12)
-plt.ylabel("Salaire mensuel moyen ($)", fontsize=12)
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.show()
-
-print("\n" + "="*50 + "\n")
-
-# =============================================================================
-# VISUALISATION 5 : SATISFACTION PAR TYPE DE CONTRAT
-# =============================================================================
-
-plt.figure(figsize=(10, 6))
+# 3. Satisfaction moyenne par type de contrat
+ax3 = plt.subplot(3, 3, 3)
 satisfaction_by_contract = df.groupby('Job Type')['Job_Satisfaction'].mean().sort_values(ascending=False)
-sns.barplot(x=satisfaction_by_contract.index, y=satisfaction_by_contract.values, palette='coolwarm')
-plt.title("Satisfaction moyenne par type de contrat", fontsize=16, fontweight='bold')
-plt.xlabel("Type de contrat", fontsize=12)
-plt.ylabel("Score de satisfaction moyen", fontsize=12)
-plt.tight_layout()
-plt.show()
+sns.barplot(x=satisfaction_by_contract.index, y=satisfaction_by_contract.values, ax=ax3,
+            hue=satisfaction_by_contract.index, palette='coolwarm', legend=False)
+ax3.set_title("3. Satisfaction moyenne par type de contrat", fontsize=12, fontweight='bold')
+ax3.set_xlabel("Type de contrat")
+ax3.set_ylabel("Score de satisfaction moyen")
 
-print("\n" + "="*50 + "\n")
-
-# =============================================================================
-# VISUALISATION 6 : TYPES DE CONTRAT PAR DÉPARTEMENT (HEATMAP)
-# =============================================================================
-
-plt.figure(figsize=(12, 8))
+# 4. Heatmap des types de contrat par département
+ax4 = plt.subplot(3, 3, 4)
 contract_dept_cross = pd.crosstab(df['Department'], df['Job Type'])
-sns.heatmap(contract_dept_cross, annot=True, fmt='d', cmap='Blues', cbar_kws={'label': 'Nombre d\'employés'})
-plt.title("Répartition des types de contrat par département", fontsize=16, fontweight='bold')
-plt.xlabel("Type de contrat", fontsize=12)
-plt.ylabel("Département", fontsize=12)
-plt.tight_layout()
-plt.show()
+sns.heatmap(contract_dept_cross, annot=True, fmt='d', cmap='Blues', ax=ax4, cbar_kws={'label': "Nombre d'employés"})
+ax4.set_title("4. Types de contrat par département", fontsize=12, fontweight='bold')
+ax4.set_xlabel("Type de contrat")
+ax4.set_ylabel("Département")
 
-print("\n" + "="*50 + "\n")
+# 5. Salaire moyen par département
+ax5 = plt.subplot(3, 3, 5)
+sns.barplot(x=avg_salaire.index, y=avg_salaire.values, ax=ax5,
+            hue=avg_salaire.index, palette='viridis', legend=False)
+ax5.set_title("5. Salaire mensuel moyen par département", fontsize=12, fontweight='bold')
+ax5.set_xlabel("Département")
+ax5.set_ylabel("Salaire mensuel moyen ($)")
+ax5.tick_params(axis='x', rotation=45)
 
-# =============================================================================
-# VISUALISATION 7 : NOMBRE DE TYPES DE CONTRAT PAR DÉPARTEMENT
-# =============================================================================
-
-plt.figure(figsize=(12, 8))
-contracts_per_dept_sorted = contracts_per_dept.sort_values(ascending=False)
-sns.barplot(x=contracts_per_dept_sorted.index, y=contracts_per_dept_sorted.values, palette='rocket')
-plt.title("Nombre de types de contrat par département", fontsize=16, fontweight='bold')
-plt.xlabel("Département", fontsize=12)
-plt.ylabel("Nombre de types de contrat", fontsize=12)
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.show()
-
-print("\n" + "="*50 + "\n")
-
-# =============================================================================
-# VISUALISATION 8 : EXPÉRIENCE MOYENNE PAR DÉPARTEMENT
-# =============================================================================
-
-plt.figure(figsize=(12, 8))
+# 6. Expérience moyenne par département
+ax6 = plt.subplot(3, 3, 6)
 avg_job_experience_sorted = avg_job_experience.sort_values(ascending=False)
-sns.barplot(x=avg_job_experience_sorted.index, y=avg_job_experience_sorted.values, palette='magma')
-plt.title("Expérience moyenne par département", fontsize=16, fontweight='bold')
-plt.xlabel("Département", fontsize=12)
-plt.ylabel("Années d'expérience moyenne", fontsize=12)
-plt.xticks(rotation=45)
-plt.tight_layout()
+sns.barplot(x=avg_job_experience_sorted.index, y=avg_job_experience_sorted.values, ax=ax6,
+            hue=avg_job_experience_sorted.index, palette='magma', legend=False)
+ax6.set_title("6. Expérience moyenne par département", fontsize=12, fontweight='bold')
+ax6.set_xlabel("Département")
+ax6.set_ylabel("Années d'expérience moyenne")
+ax6.tick_params(axis='x', rotation=45)
+
+# 7. Satisfaction moyenne par département (camembert)
+ax7 = plt.subplot(3, 3, 7)
+ax7.pie(avg_satisfaction.values, labels=avg_satisfaction.index, autopct='%1.1f%%',
+        startangle=140, colors=sns.color_palette('pastel'))
+ax7.set_title("7. Satisfaction moyenne par département", fontsize=12, fontweight='bold')
+
+# 8. Nombre de types de contrat par département
+ax8 = plt.subplot(3, 3, 8)
+contracts_per_dept_sorted = contracts_per_dept.sort_values(ascending=False)
+sns.barplot(x=contracts_per_dept_sorted.index, y=contracts_per_dept_sorted.values, ax=ax8,
+            hue=contracts_per_dept_sorted.index, palette='rocket', legend=False)
+ax8.set_title("8. Nombre de types de contrat par département", fontsize=12, fontweight='bold')
+ax8.set_xlabel("Département")
+ax8.set_ylabel("Nombre de types de contrat")
+ax8.tick_params(axis='x', rotation=45)
+
+# 9. Matrice de corrélation
+ax9 = plt.subplot(3, 3, 9)
+numeric_columns = df.select_dtypes(include=[np.number]).columns
+correlation_matrix = df[numeric_columns].corr()
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', center=0, fmt='.2f', ax=ax9)
+ax9.set_title("9. Matrice de corrélation", fontsize=12, fontweight='bold')
+
+# Ajuster l'espacement entre les sous-graphiques
+plt.tight_layout(pad=3.0)
+
+# Ajouter un titre principal à toute la figure
+fig.suptitle('ANALYSE COMPLÈTE DES RESSOURCES HUMAINES', fontsize=20, fontweight='bold', y=0.98)
+
+# Sauvegarder l'image complète
+plt.savefig('analyse_rh_complete.png', dpi=300, bbox_inches='tight')
 plt.show()
 
 print("\n" + "="*50 + "\n")
 
 # =============================================================================
-# VISUALISATION 9 : RÉPARTITION PAR PAYS (SI LA COLONNE EXISTE)
+# VISUALISATION SUPPLÉMENTAIRE POUR LES PAYS (SI EXISTE) - CORRIGÉE
 # =============================================================================
 
 if 'Country' in df.columns:
-    plt.figure(figsize=(15, 10))
+    print("=== VISUALISATION GÉOGRAPHIQUE ===")
 
-    # Graphique à barres pour la répartition
-    plt.subplot(2, 2, 1)
-    sns.barplot(x=repartition_pays.index, y=repartition_pays.values, palette='Set2')
-    plt.title("Nombre d'employés par pays", fontsize=14, fontweight='bold')
-    plt.xlabel("Pays", fontsize=10)
-    plt.ylabel("Nombre d'employés", fontsize=10)
-    plt.xticks(rotation=45)
+    fig2 = plt.figure(figsize=(20, 15))
 
-    # Graphique circulaire
-    plt.subplot(2, 2, 2)
-    plt.pie(repartition_pays.values,
-            labels=repartition_pays.index,
-            autopct='%1.1f%%',
-            startangle=90,
-            colors=sns.color_palette('pastel'))
-    plt.title("Répartition en pourcentage par pays", fontsize=14)
+    # 1. Répartition par pays
+    ax1 = plt.subplot(2, 2, 1)
+    sns.barplot(x=repartition_pays.index, y=repartition_pays.values, ax=ax1,
+                hue=repartition_pays.index, palette='Set2', legend=False)
+    ax1.set_title("Répartition des employés par pays", fontsize=12, fontweight='bold')
+    ax1.set_xlabel("Pays")
+    ax1.set_ylabel("Nombre d'employés")
+    ax1.tick_params(axis='x', rotation=45)
 
-    # Satisfaction par pays
-    plt.subplot(2, 2, 3)
+    # 2. Camembert des pays
+    ax2 = plt.subplot(2, 2, 2)
+    ax2.pie(repartition_pays.values, labels=repartition_pays.index, autopct='%1.1f%%',
+            startangle=90, colors=sns.color_palette('pastel'))
+    ax2.set_title("Répartition en pourcentage par pays", fontsize=12, fontweight='bold')
+
+    # 3. Satisfaction par pays
+    ax3 = plt.subplot(2, 2, 3)
     satisfaction_par_pays = df.groupby('Country')['Job_Satisfaction'].mean().sort_values(ascending=False)
-    sns.barplot(x=satisfaction_par_pays.index, y=satisfaction_par_pays.values, palette='viridis')
-    plt.title("Satisfaction moyenne par pays", fontsize=14, fontweight='bold')
-    plt.xlabel("Pays")
-    plt.ylabel("Satisfaction moyenne")
-    plt.xticks(rotation=45)
+    sns.barplot(x=satisfaction_par_pays.index, y=satisfaction_par_pays.values, ax=ax3,
+                hue=satisfaction_par_pays.index, palette='viridis', legend=False)
+    ax3.set_title("Satisfaction moyenne par pays", fontsize=12, fontweight='bold')
+    ax3.set_xlabel("Pays")
+    ax3.set_ylabel("Satisfaction moyenne")
+    ax3.tick_params(axis='x', rotation=45)
 
-    # Salaire par pays
-    plt.subplot(2, 2, 4)
+    # 4. Salaire par pays
+    ax4 = plt.subplot(2, 2, 4)
     salaire_par_pays = df.groupby('Country')['MonthlyIncome'].mean().sort_values(ascending=False)
-    sns.barplot(x=salaire_par_pays.index, y=salaire_par_pays.values, palette='plasma')
-    plt.title("Salaire moyen par pays", fontsize=14, fontweight='bold')
-    plt.xlabel("Pays")
-    plt.ylabel("Salaire moyen ($)")
-    plt.xticks(rotation=45)
+    sns.barplot(x=salaire_par_pays.index, y=salaire_par_pays.values, ax=ax4,
+                hue=salaire_par_pays.index, palette='plasma', legend=False)
+    ax4.set_title("Salaire moyen par pays", fontsize=12, fontweight='bold')
+    ax4.set_xlabel("Pays")
+    ax4.set_ylabel("Salaire moyen ($)")
+    ax4.tick_params(axis='x', rotation=45)
 
-    plt.tight_layout()
+    plt.tight_layout(pad=3.0)
+    fig2.suptitle('ANALYSE GÉOGRAPHIQUE', fontsize=16, fontweight='bold', y=0.98)
+    plt.savefig('analyse_geographique.png', dpi=300, bbox_inches='tight')
     plt.show()
 
 print("\n" + "="*50 + "\n")
@@ -353,16 +329,6 @@ print("\n" + "="*50 + "\n")
 # =============================================================================
 
 print("=== MATRICE DE CORRÉLATION ===")
-# Sélectionner uniquement les colonnes numériques
-numeric_columns = df.select_dtypes(include=[np.number]).columns
-correlation_matrix = df[numeric_columns].corr()
-
-plt.figure(figsize=(10, 8))
-sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', center=0, fmt='.2f')
-plt.title("Matrice de corrélation des variables numériques", fontsize=16, fontweight='bold')
-plt.tight_layout()
-plt.show()
-
 print("Matrice de corrélation :")
 print(correlation_matrix.round(2))
 
@@ -398,3 +364,7 @@ if 'Country' in df.columns:
 print("\n=== VALEURS MANQUANTES ===")
 missing_values = df.isnull().sum()
 print(missing_values[missing_values > 0])
+
+print("\n✅ Toutes les visualisations ont été regroupées en 1-2 images principales!")
+print("📊 Les images ont été sauvegardées comme 'analyse_rh_complete.png' et 'analyse_geographique.png'")
+
